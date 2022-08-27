@@ -28,6 +28,17 @@ target = [
 htmls = []
 
 
+def process_img(m):
+    '''
+    修改内容中img标签图片路径，由相对路径修改为绝对路径
+    '''
+    if not m.group(1).startswith("https"):
+        url = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(start_url))
+        return f'<img src="{url}{m.group(1)}"/>'
+    else:
+        return f'<img src="{m.group(1)}"/>'
+
+
 def parse_body(index, url):
     '''
     解析正文
@@ -36,17 +47,8 @@ def parse_body(index, url):
     soup = BeautifulSoup(response.content, "html.parser")
     title = soup.find('h4').get_text()
     body = soup.find_all(class_="x-wiki-content")[0]
-
-    # 修改body中img标签图片路径，由相对路径修改为绝对路径
-    def func(m):
-        if not m.group(1).startswith("https"):
-            scheme = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(start_url))
-            return f'<img src="{scheme}{m.group(1)}"/>'
-        else:
-            return f'<img src="{m.group(1)}"/>'
-
     obj = re.compile(r'<img.*?data-src="(.*?)".*?/>', re.S)
-    content = obj.sub(func, str(body))
+    content = obj.sub(process_img, str(body))
     content = html_template.format(title=title, content=content)
     file_name = f"{str(index)}.html"
     with open(file_name, 'w') as f:
