@@ -106,8 +106,8 @@ if __name__ == '__main__':
     }
 
     try:
-        pdfkit.from_file(htmls, "CSDN.pdf", options=options)
-        # pdfkit.from_file(htmls, "CSDN.pdf")
+        # pdfkit.from_file(htmls, "CSDN.pdf", options=options)
+        pdfkit.from_file(htmls, "CSDN.pdf")
     except Exception as e:
         print(e)
     for html in htmls:
